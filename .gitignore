@@ -50,3 +50,8 @@ htmlcov/
 # 静态资源缓存（可选）
 static/
 media/
+
+# ========== 新增前端Vite相关 ==========
+node_modules/
+dist/
+.vite/

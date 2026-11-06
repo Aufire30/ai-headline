@@ -53,5 +53,6 @@ media/
 
 # ========== 新增前端Vite相关 ==========
 node_modules/
-dist/
 .vite/
+.vite-temp/
+dist/

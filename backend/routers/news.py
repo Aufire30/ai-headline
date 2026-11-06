@@ -1,4 +1,6 @@
 # 模块化路由
+from fastapi import HTTPException
+
 from fastapi import APIRouter, Depends, Query
 from setuptools.command.alias import alias
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -40,5 +42,37 @@ async def get_news_list(
             "list":news_list,
             "total":total,
             "hasMore":has_more
+        }
+    }
+
+
+@router.get("/detail")
+async def get_news_detail(
+        news_id:int = Query(...,alias = "id"),
+        db:AsyncSession = Depends(get_database)
+):
+    news_detail = await news.get_news_detail(db,news_id)
+    if not news_detail:
+        raise HTTPException(status_code = 404,detail = "This news does not exist")
+
+    view_res = await news.increase_news_views(db,news_detail.id)
+    if not view_res:
+        return HTTPException(status_code = 404,detail="This news does not exist")
+
+    related_news = await news.get_related_news(db,news_detail.id,news_detail.category_id)
+
+    return{
+        "code":200,
+        "message":"success",
+        "data":{
+            "id":news_detail.id,
+            "title":news_detail.title,
+            "content":news_detail.content,
+            "image":news_detail.image,
+            "author":news_detail.author,
+            "publishTime":news_detail.publish_time,
+            "category":news_detail.category_id,
+            "views":news_detail.views,
+            "relatedNews": related_news
         }
     }
